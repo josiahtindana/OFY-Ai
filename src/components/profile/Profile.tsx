@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Mail, Settings, Save, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '../common/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../common/Card';
+import { supabase } from '../../lib/supabase';
 
 export function Profile() {
   const [isSaving, setIsSaving] = useState(false);
@@ -9,11 +10,19 @@ export function Profile() {
 
   const [profile, setProfile] = useState({
     fullName: 'Alex Johnson',
-    email: 'alex.johnson@example.com',
+    email: '',
     careerGoal: 'Public Health Professional',
     educationLevel: 'Master\'s Degree',
     targetCountries: 'Europe, North America',
   });
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setProfile(prev => ({ ...prev, email: user.email || '' }));
+      }
+    });
+  }, []);
 
   const [preferences, setPreferences] = useState({
     tone: 'professional',

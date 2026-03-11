@@ -5,9 +5,10 @@ import { cn } from '../../utils/cn';
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  onSignOut: () => void;
 }
 
-export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+export function Sidebar({ activeTab, setActiveTab, onSignOut }: SidebarProps) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Briefcase },
     { id: 'search', label: 'Opportunities', icon: Search },
@@ -48,7 +49,10 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       </nav>
 
       <div className="p-4 border-t border-slate-800">
-        <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-colors text-sm font-medium text-slate-400 hover:text-white">
+        <button 
+          onClick={onSignOut}
+          className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-colors text-sm font-medium text-slate-400 hover:text-white"
+        >
           <LogOut className="w-5 h-5" />
           <span>Sign Out</span>
         </button>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Authenticating...</title>
+</head>
+<body>
+  <script>
+    if (window.opener) {
+      window.opener.postMessage({ 
+        type: 'OAUTH_CALLBACK', 
+        url: window.location.href 
+      }, '*');
+      window.close();
+    } else {
+      document.body.innerHTML = 'Authentication complete. You can close this window.';
+    }
+  </script>
+</body>
+</html>

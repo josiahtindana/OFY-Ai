@@ -22,11 +22,7 @@ async function startServer() {
   app.post("/api/opportunities/search", async (req, res) => {
     try {
       const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-        return res.status(401).json({ error: "Missing or invalid Gemini API Key. Please configure it in the Secrets panel." });
-      }
-      
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = new GoogleGenAI({ apiKey: apiKey as string });
       const { query } = req.body;
       
       const prompt = `
@@ -74,24 +70,16 @@ async function startServer() {
   });
 
   // CV Review Endpoint using Gemini Structured Outputs
-  app.post("/api/ai/review-cv", upload.single("cv"), async (req, res) => {
+  app.post("/api/ai/review-cv", async (req, res) => {
     try {
       const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-        return res.status(401).json({ error: "Missing or invalid Gemini API Key. Please configure it in the Secrets panel." });
-      }
       
-      const ai = new GoogleGenAI({ apiKey });
-      const { opportunity_text } = req.body;
-      const cvFile = req.file;
+      const ai = new GoogleGenAI({ apiKey: apiKey as string });
+      const { opportunity_text, cv_text } = req.body;
       
-      if (!cvFile || !opportunity_text) {
-        return res.status(400).json({ error: "Missing CV file or opportunity text" });
+      if (!cv_text || !opportunity_text) {
+        return res.status(400).json({ error: "Missing CV text or opportunity text" });
       }
-
-      // In a real app, we would extract text from PDF/DOCX here.
-      // For this prototype, we'll assume the user pasted text or we extracted it.
-      const cvText = req.body.cv_text || "Sample CV Text: Experienced project manager in public health...";
 
       const prompt = `
         Analyze the provided CV against the target Opportunity Description.
@@ -100,9 +88,10 @@ async function startServer() {
         1. NEVER fabricate, invent, or hallucinate experiences, skills, or qualifications for the user.
         2. Provide constructive, actionable, and specific feedback.
         3. Maintain an encouraging, professional, and ethical tone.
+        4. Generate a fully rewritten, recommended CV that is tailored to suit the opportunity based on the provided CV.
 
         CV Text:
-        ${cvText}
+        ${cv_text}
 
         Opportunity Description:
         ${opportunity_text}
@@ -144,9 +133,10 @@ async function startServer() {
                   }
                 }
               },
+              recommended_cv: { type: Type.STRING, description: "A fully rewritten CV tailored to the opportunity based on the original CV." },
               ethical_guidance: { type: Type.STRING }
             },
-            required: ["match_score", "skills_alignment", "experience_alignment", "ats_compatibility_score", "section_suggestions", "ethical_guidance"]
+            required: ["match_score", "skills_alignment", "experience_alignment", "ats_compatibility_score", "section_suggestions", "recommended_cv", "ethical_guidance"]
           }
         }
       });
@@ -164,11 +154,7 @@ async function startServer() {
   app.post("/api/ai/improve-essay", async (req, res) => {
     try {
       const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-        return res.status(401).json({ error: "Missing or invalid Gemini API Key. Please configure it in the Secrets panel." });
-      }
-      
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = new GoogleGenAI({ apiKey: apiKey as string });
       const { draft_text, opportunity_text, instructions } = req.body;
       
       if (!draft_text || !opportunity_text) {

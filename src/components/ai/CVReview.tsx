@@ -20,6 +20,7 @@ interface ReviewResult {
     suggested_rewrite: string;
     reason: string;
   }>;
+  recommended_cv: string;
   ethical_guidance: string;
 }
 
@@ -202,6 +203,17 @@ export function CVReview() {
                       <p className="text-xs text-slate-500 italic mt-2">Why: {suggestion.reason}</p>
                     </div>
                   ))}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recommended CV</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 whitespace-pre-wrap text-sm text-slate-800 font-mono">
+                    {result.recommended_cv}
+                  </div>
                 </CardContent>
               </Card>
 
